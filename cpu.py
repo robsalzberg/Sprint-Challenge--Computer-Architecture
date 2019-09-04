@@ -11,6 +11,7 @@ PUSH = 0b01000101
 CALL = 0b01010000
 RET = 0b00010001
 ADD = 0b10100000
+CMP = 0b10100111
 
 class CPU:
     """Main CPU class."""
@@ -21,7 +22,7 @@ class CPU:
         # RAM stores 256 bytes
         self.ram = [0] * 256
 
-        # Each index in reg is a register
+        # Each index in reg is a reg
         self.reg = [0] * 8
 
         # Store the Program Counter
@@ -32,6 +33,10 @@ class CPU:
         self.SP = 7
         self.previous = None
 
+        #Flag pointer
+        self.FP = 4
+        self.Flag = self.reg[self.FP]
+
         self.inst = {
             HLT: self.HLT,
             LDI: self.LDI,
@@ -41,7 +46,8 @@ class CPU:
             PUSH: self.PUSH,
             CALL: self.CALL,
             RET: self.RET,
-            ADD: self.ADD
+            ADD: self.ADD,
+            CMP: self.CMP
         }
 
     def ram_read(self, address):
@@ -82,6 +88,9 @@ class CPU:
     def ADD(self, operand_a, operand_b):
         self.alu("ADD", operand_a, operand_b)
 
+    def CMP(self, operand_a, operand_b):
+        self.alu("CMP", operand_a, operand_b)
+
     def load(self, filename):
         """Load a program into memory."""
         address = 0
@@ -107,6 +116,23 @@ class CPU:
 
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+
+        elif op =="CMP":
+            # Compare the values in two registers.
+            # `FL` bits: `00000LGE`
+            if self.reg[reg_a] < self.reg[reg_b]
+            # * If reg_a is less than reg_b, set the Less-than flag to 1,
+            #   otherwise set it to 0.
+            self.Flag = 0b00000100
+
+             elif self.reg[reg_a] == self.reg[reg_b]
+            # * If they are equal, set the Equal flag to 1, otherwise set it to 0.
+            self.Flag = 0b00000001
+
+             elif self.reg[reg_a] > self.reg[reg_b]
+            # * If reg_a is greater than reg_b, set the Greater-than flag
+            #   to 1, otherwise set it to 0.
+            self.Flag = 0b00000010
 
         else:
             raise Exception("Unsupported ALU operation")
