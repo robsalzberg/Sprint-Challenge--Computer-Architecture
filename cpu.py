@@ -13,6 +13,8 @@ RET = 0b00010001
 ADD = 0b10100000
 CMP = 0b10100111
 JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 
 class CPU:
     """Main CPU class."""
@@ -49,7 +51,9 @@ class CPU:
             RET: self.RET,
             ADD: self.ADD,
             CMP: self.CMP,
-            JMP: self.JMP
+            JMP: self.JMP,
+            JEQ: self.JEQ,
+            JNE: self.JNE
         }
 
     def ram_read(self, address):
@@ -94,7 +98,23 @@ class CPU:
         self.alu("CMP", operand_a, operand_b)
 
     def JMP(self, operand_a, operand_b):
-        self.PC = self.register[operand_a]
+        self.pc = self.reg[operand_a]
+
+    def JEQ(self, operand_a, operand_b):
+        # if equal flag is true then jump to address stored in given register.
+        if self.Flag == 0b00000001:
+            self.pc = self.reg[operand_a]
+        else:
+        # else if equal falg is false increase PC by 2
+            self.pc += 2
+
+    def JNE(self, operand_a, operand_b):
+        # if equal flag is false or clear then jump to address stored in given register.
+        if self.Flag == 0b00000100 or self.Flag == 0b00000010:
+            self.pc = self.reg[operand_a]
+        else:
+        # else if flag is true increase PC by 2
+            self.pc += 2
 
     def load(self, filename):
         """Load a program into memory."""
@@ -138,6 +158,9 @@ class CPU:
             # * If reg_a is greater than reg_b, set the Greater-than flag
             #   to 1, otherwise set it to 0.
                 self.Flag = 0b00000010
+
+            else:
+                print('Code is broken')
 
         else:
             raise Exception("Unsupported ALU operation")
